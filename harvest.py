@@ -54,7 +54,11 @@ def api(url, args):
     the_page = response.read()
     return the_page
 
-print api("friends/ids.json", {"cursor":"-1", "screen_name":"twitterapi"})
-
+#use calls from https://dev.twitter.com/docs/api
+target = "twitterapi"
+print api("followers/ids.json", {"screen_name":target}) #gets all followers
+print api("friends/ids.json", {"screen_name":target}) #gets all following
+print api("statuses/user_timeline.json", {"count":"200", "screen_name":target}) #gets 200 tweets, not including RTs capped at 3200  #keeps getting 'bad gateway' 
+print api("statuses/retweeted_by_user.json", {"count":"100", "screen_name":target}) #gets 100 retweets, unknown cap
 print api("users/lookup.json", {"user_id":"6253282"})
 
