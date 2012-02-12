@@ -3,9 +3,9 @@ import os, base64, time, urllib, hashlib, hmac, urllib2
 #http://packages.python.org/tweepy/html/auth_tutorial.html
 
 consumer_key = "D9UDOREUonmfuA67RFJ0A"
-consumer_secret = "bk1bI1U4tM8XTBkz3bFciM6pWW5tygdNsOESNSk"
+consumer_secret = "bk1bI1U4tM8XTBkz3bFciM6pWW5tygdNsOESNSk" #shouldn't really be public
 access_token = "490379139-ksKju3iLmWfd66JTdZWnqFEE7qSR1ueAKllO6QOn"
-access_secret = "uL2iAXr7EOUgkXgQMxHx1smocuGisByVldhm0GMGCI"
+access_secret = "uL2iAXr7EOUgkXgQMxHx1smocuGisByVldhm0GMGCI" #shouldn't really be public
 
 signature_method = "HMAC-SHA1"
 oauth_version = "1.0"
