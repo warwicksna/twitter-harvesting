@@ -48,28 +48,51 @@ def api(url, args):
         url += urllib.quote(k)+"="+urllib.quote(v)+"&"
     url = url[:-1]
     headers = {'Authorization' : finalString}
-
-    req = urllib2.Request(url, None, headers)
-    response = urllib2.urlopen(req)
-    the_page = response.read()
+    fails = 0
+    while(fails < 5):
+        try:
+            req = urllib2.Request(url, None, headers)
+            response = urllib2.urlopen(req)
+            the_page = response.read()
+            break
+        except urllib2.HTTPError as error:
+            fails +=1
+            print "Attempt "+str(fails)+" failed: "+str(error)
+            continue
     return the_page
 
-def getFollowers(target):
+def fetchUsers(url, args):
     cursor = "-1"
     followers = []
     while(cursor != "0"):
-        data = json.loads(api("followers/ids.json", {"cursor": cursor, "screen_name":target}))
+        data = json.loads(api(url, args))
         followers = followers + data['ids']
         cursor = data['next_cursor_str']
+        args["cursor"] = cursor
+    return followers
+    
+def fetchTweets(url, args):
+    page = 1
+    tweets = []
+    data = ["z"]
+    while(data != []):
+        time.sleep(5)
+        data = json.loads(api(url, args))
+        tweets = tweets + data
+        page+=1
+        args["page"]=str(page)
+    return tweets
         
 #use calls from https://dev.twitter.com/docs/api
-target = "uaf"
-getFollowers(target)
+
+target = "uaf"  #how appropriate
+followers = fetchUsers("followers/ids.json", {"screen_name":target}) #gets all followers
+following = fetchUsers("friends/ids.json", {"screen_name":target}) #gets all following
+contacts = list(set(following) | set(followers))
+print len(contacts)
+
+#print fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "screen_name":target}) #randomly drops a few tweets
+#print fetchTweets("statuses/retweeted_by_user.json", {"count":"100", "trim_user":"true", "screen_name":target}) #gets 100 retweets, unknown cap
 
 
-#print api("followers/ids.json", {"cursor":"-1", "screen_name":target}) #gets all followers
-#print api("friends/ids.json", {"screen_name":target}) #gets all following
-#print api("statuses/user_timeline.json", {"count":"200", "screen_name":target}) #gets 200 tweets, not including RTs capped at 3200  #keeps getting 'bad gateway' 
-#print api("statuses/retweeted_by_user.json", {"count":"100", "screen_name":target}) #gets 100 retweets, unknown cap
-#print api("users/lookup.json", {"user_id":"6253282"})
 
