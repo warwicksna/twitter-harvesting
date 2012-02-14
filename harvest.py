@@ -106,12 +106,15 @@ def fetchTweets(url, args):
     return tweets
         
         
-#TODO return json instead of string from api()
+#TODO
+#check for X-Warning header wrt. rate limiting
+#return json instead of string from api()
 #save data&state to tables
 
 #use calls from https://dev.twitter.com/docs/api
 
 print api("account/rate_limit_status.json", {}) #the hourly limit is 150?. It should be 350.
+                                                #perhaps this fix https://dev.twitter.com/discussions/1214 check X-Warning-Header
 
 target = "uaf"  #how appropriate
 target = json.loads(api("users/lookup.json",{"screen_name":target}))[0]["id"]
