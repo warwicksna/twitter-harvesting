@@ -1,5 +1,13 @@
 import os, base64, time, urllib, hashlib, hmac, urllib2, re, json
 
+class twitterError(Exception):
+    def __init__(self, desc, code):
+        self.value = desc
+        self.code = code
+        
+    def __str__(self):
+        return repr(self.value)
+
 def api(url, args):
     base = "https://api.twitter.com/1/"
     url = base + url
@@ -56,17 +64,31 @@ def api(url, args):
             the_page = response.read()
             break
         except urllib2.HTTPError as error:
-            fails +=1
-            print "Attempt "+str(fails)+" failed: "+str(error)
-            continue
+            if(error.code == 401):
+                raise twitterError('Protected user', 1)
+            elif(error.code == 502):
+                fails +=1
+                print "Bad gateway on attempt "+str(fails)+""
+                continue
+            elif(error.code == 400):
+                print "Rate limit hit. Time for a nap."
+                time.sleep(json.loads(api("account/rate_limit_status.json", {}))["reset_time_in_seconds"])
+                continue
+            else:
+                print url
+                raise
     return the_page
 
 def fetchUsers(url, args):
     cursor = "-1"
     followers = []
     while(cursor != "0"):
-        data = json.loads(api(url, args))
-        followers = followers + data['ids']
+        try:
+            data = json.loads(api(url, args))
+            followers = followers + data['ids']
+        except twitterError:
+            print "Skipping protected user"
+            break
         cursor = data['next_cursor_str']
         args["cursor"] = cursor
     return followers
@@ -83,20 +105,31 @@ def fetchTweets(url, args):
         args["page"]=str(page)
     return tweets
         
+        
+#TODO return json instead of string from api()
+#save data&state to tables
+
 #use calls from https://dev.twitter.com/docs/api
 
-target = "uaf"  #how appropriate
-followers = fetchUsers("followers/ids.json", {"screen_name":target}) #gets all followers
-following = fetchUsers("friends/ids.json", {"screen_name":target}) #gets all following
-contacts = list(set(following) | set(followers))
-print len(contacts)
+print api("account/rate_limit_status.json", {}) #the hourly limit is 150?. It should be 350.
 
-#start with queue = target
-#for contact in contacts:
-#    look up&save their followers/following
-#    append contacts to queue
-#    save their tweets
-#    dequeue()
+target = "uaf"  #how appropriate
+target = json.loads(api("users/lookup.json",{"screen_name":target}))[0]["id"]
+done = set([])
+queue = [target]
+
+while(True):
+    target = queue.pop(0)
+    done.add(target)
+    followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
+    following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
+   #    save their tweets
+   
+    queue += (list((following & followers)-done))
+    queue += (list((following ^ followers)-done))
+    print done
+    print len(queue)
+
 
 
 
