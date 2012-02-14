@@ -91,6 +91,16 @@ following = fetchUsers("friends/ids.json", {"screen_name":target}) #gets all fol
 contacts = list(set(following) | set(followers))
 print len(contacts)
 
+#start with queue = target
+#for contact in contacts:
+#    look up&save their followers/following
+#    append contacts to queue
+#    save their tweets
+#    dequeue()
+
+
+
+
 #print fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "screen_name":target}) #randomly drops a few tweets
 #print fetchTweets("statuses/retweeted_by_user.json", {"count":"100", "trim_user":"true", "screen_name":target}) #gets 100 retweets, unknown cap
 
