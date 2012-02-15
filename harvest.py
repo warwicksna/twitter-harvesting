@@ -1,4 +1,4 @@
-import os, base64, time, urllib, hashlib, hmac, urllib2, re, json
+import os, base64, time, urllib, hashlib, hmac, urllib2, re, json, sqlite3
 
 class twitterError(Exception):
     def __init__(self, desc, code):
@@ -72,19 +72,19 @@ oauth_version=\""+oauth_version+"\""
                 continue
             elif(error.code == 400):
                 print "Rate limit hit. Time for a nap."
-                time.sleep(json.loads(api("account/rate_limit_status.json", {}))["reset_time_in_seconds"])
+                time.sleep(api("account/rate_limit_status.json", {})["reset_time_in_seconds"])
                 continue
             else:
                 print url
                 raise
-    return the_page
+    return json.loads(the_page)
 
 def fetchUsers(url, args):
     cursor = "-1"
     followers = []
     while(cursor != "0"):
         try:
-            data = json.loads(api(url, args))
+            data = api(url, args)
             followers = followers + data['ids']
         except twitterError:
             print "Skipping protected user"
@@ -98,8 +98,11 @@ def fetchTweets(url, args):
     tweets = []
     data = ["z"]
     while(data != []):
-        time.sleep(5)
-        data = json.loads(api(url, args))
+        try:
+            data = api(url, args)
+        except twitterError:
+            print "Skipping protected user"
+            break
         tweets = tweets + data
         page+=1
         args["page"]=str(page)
@@ -107,30 +110,38 @@ def fetchTweets(url, args):
         
         
 #TODO
-#check for X-Warning header wrt. rate limiting
-#return json instead of string from api()
-#save data&state to tables
-
-#use calls from https://dev.twitter.com/docs/api
-
+#deal with protected users
 
 #print api("account/verify_credentials.json", {})
 #print api("account/rate_limit_status.json", {})
 
-target = "uaf"  #how appropriate
-target = json.loads(api("users/lookup.json",{"screen_name":target}))[0]["id"]
-done = set([])
-queue = [target]
+conn = sqlite3.connect('./rettiwt.db')
+curse = conn.cursor()
+try:
+    print curse.execute("select done from state").fetchone()[0]
+    done = set(json.loads(curse.execute("select done from state").fetchone()[0]))
+    queue = json.loads(curse.execute("select queue from state").fetchone()[0])
+except sqlite3.OperationalError:
+    curse.execute("create table gotcha (uid text, following text, followers text, tweets text)") #a smarter db design might help
+    curse.execute("create table state (done text, queue text)")
+    curse.execute("insert into state values ('', '')")
+    target = "uaf"  #how appropriate
+    target = api("users/lookup.json",{"screen_name":target})[0]["id"]
+    done = set([])
+    queue = [target]
 
 while(True):
     target = queue.pop(0)
     done.add(target)
     followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
     following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
-   #    save their tweets
-   
+    tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
+
     queue += (list((following & followers)-done))
     queue += (list((following ^ followers)-done))
+    curse.execute('insert into gotcha values (?, ?, ?, ?)', (str(target), str(following), str(followers), str(tweets)))
+    curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
+    conn.commit()
     print done
     print len(queue)
 
@@ -138,8 +149,8 @@ while(True):
 
 
 
-#print fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "screen_name":target}) #randomly drops a few tweets
 #print fetchTweets("statuses/retweeted_by_user.json", {"count":"100", "trim_user":"true", "screen_name":target}) #gets 100 retweets, unknown cap
+   
 
 
 
