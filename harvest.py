@@ -18,7 +18,7 @@ def api(url, args):
     signature_method = "HMAC-SHA1"
     oauth_version = "1.0"
     digest_maker = hmac.new(urllib.quote(consumer_secret)+'&'+urllib.quote(access_secret), '', hashlib.sha1)
-    nonce = base64.urlsafe_b64encode(os.urandom(32))
+    nonce = base64.b16encode(os.urandom(16))
     timestamp = time.time()
     HTTP_method = "GET"
     paramstring = ""
@@ -40,17 +40,17 @@ def api(url, args):
         paramstring +=key + "=" + params[key] + '&'
         
     paramstring = paramstring[:-1]
-    output = HTTP_method+'&'+urllib.quote(url)+'&'+urllib.quote(paramstring);
+    output = HTTP_method+'&'+urllib.quote(url, '')+'&'+urllib.quote(paramstring, '');
     digest_maker.update(output)
     signature = base64.encodestring(digest_maker.digest())[:-1]
 
     finalString = "OAuth oauth_consumer_key=\""+consumer_key+"\", \
-    oauth_nonce=\""+urllib.quote(nonce)+"\", \
-    oauth_signature=\""+urllib.quote(signature)+"\", \
-    oauth_signature_method=\""+signature_method+"\", \
-    oauth_timestamp=\""+str(timestamp)+"\", \
-    oauth_token=\""+access_token+"\", \
-    oauth_version=\""+oauth_version+"\""
+oauth_nonce=\""+urllib.quote(nonce)+"\", \
+oauth_signature=\""+urllib.quote(signature)+"\", \
+oauth_signature_method=\""+signature_method+"\", \
+oauth_timestamp=\""+str(timestamp)+"\", \
+oauth_token=\""+access_token+"\", \
+oauth_version=\""+oauth_version+"\""
     url+="?"
     for k, v in args.iteritems():
         url += urllib.quote(k)+"="+urllib.quote(v)+"&"
@@ -113,8 +113,9 @@ def fetchTweets(url, args):
 
 #use calls from https://dev.twitter.com/docs/api
 
-print api("account/rate_limit_status.json", {}) #the hourly limit is 150?. It should be 350.
-                                                #perhaps this fix https://dev.twitter.com/discussions/1214 check X-Warning-Header
+
+#print api("account/verify_credentials.json", {})
+#print api("account/rate_limit_status.json", {})
 
 target = "uaf"  #how appropriate
 target = json.loads(api("users/lookup.json",{"screen_name":target}))[0]["id"]
