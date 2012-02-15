@@ -66,7 +66,7 @@ oauth_version=\""+oauth_version+"\""
         except urllib2.HTTPError as error:
             if(error.code == 401):
                 raise twitterError('Protected user', 1)
-            elif(error.code == 502):
+            elif(error.code == 502 or error.code == 503):
                 fails +=1
                 print "Bad gateway on attempt "+str(fails)+""
                 continue
