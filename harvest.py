@@ -74,8 +74,9 @@ oauth_version=\""+oauth_version+"\""
                     time.sleep(pow(10, (fail-4)))
                 continue
             elif(error.code == 400):
-                print "Rate limit hit. Time for a nap."
-                time.sleep(api("account/rate_limit_status.json", {})["reset_time_in_seconds"])
+                status = api("account/rate_limit_status.json", {})["reset_time_in_seconds"
+                print "Rate limit hit. Sleeping for "+status+" seconds"
+                time.sleep(status)
                 continue
             else:
                 print url
