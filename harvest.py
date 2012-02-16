@@ -75,7 +75,7 @@ oauth_version=\""+oauth_version+"\""
                 continue
             elif(error.code == 400):
                 status = time.time()-api("account/rate_limit_status.json", {})["reset_time_in_seconds"]
-                print "Rate limit hit. Sleeping for "+status+" seconds"
+                print "Rate limit hit. Sleeping for "+str(status)+" seconds"
                 time.sleep(status)
                 continue
             else:
