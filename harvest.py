@@ -57,7 +57,7 @@ oauth_version=\""+oauth_version+"\""
     url = url[:-1]
     headers = {'Authorization' : finalString}
     fails = 0
-    while(fails < 10):
+    while(fails < 20):
         try:
             req = urllib2.Request(url, None, headers)
             response = urllib2.urlopen(req)
@@ -71,7 +71,7 @@ oauth_version=\""+oauth_version+"\""
                 print "Bad gateway on attempt "+str(fails)+""
                 if(fails >= 5):
                     print 'Too many 50X errors, taking a nap'
-                    time.sleep(pow(10, (fail-4)))
+                    time.sleep(pow(2, (fail)))
                 continue
             elif(error.code == 400):
                 status = api("account/rate_limit_status.json", {})["reset_time_in_seconds"]-time.time()
