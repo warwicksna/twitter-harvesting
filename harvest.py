@@ -1,4 +1,5 @@
 import os, base64, time, urllib, hashlib, hmac, urllib2, re, json, sqlite3
+# -*- coding: utf8 -*-
 
 class twitterError(Exception):
     def __init__(self, desc, code):
