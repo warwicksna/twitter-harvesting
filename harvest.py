@@ -119,7 +119,7 @@ def fetchTweets(url, args):
 
 #print api("account/verify_credentials.json", {})
 #print api("account/rate_limit_status.json", {})
-
+maxSize = 50000
 conn = sqlite3.connect('./rettiwt.db')
 curse = conn.cursor()
 try:
@@ -130,7 +130,7 @@ except sqlite3.OperationalError:
     curse.execute("create table gotcha (uid text, following text, followers text, tweets text)") #a smarter db design might help
     curse.execute("create table state (done text, queue text)")
     curse.execute("insert into state values ('', '')")
-    target = "uaf"  #how appropriate
+    target = "uaf"  #how appropriate 
     target = api("users/lookup.json",{"screen_name":target})[0]["id"]
     done = set([])
     queue = [target]
@@ -142,13 +142,13 @@ while(True):
     following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
     tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
 
-    queue += (list((following & followers)-done-set(queue)))
-    queue += (list((following ^ followers)-done-set(queue)))
+    if(len(queue) < maxSize):
+        queue += (list((following & followers)-done-set(queue)))
+        queue += (list((following ^ followers)-done-set(queue)))
     curse.execute('insert into gotcha values (?, ?, ?, ?)', (str(target), str(following), str(followers), str(tweets)))
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     conn.commit()
-    print done
-    print len(queue)
+    print len(done)
 
 
 
