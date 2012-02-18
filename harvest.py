@@ -142,8 +142,8 @@ while(True):
     following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
     tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
 
-    queue += (list((following & followers)-done))
-    queue += (list((following ^ followers)-done))
+    queue += (list((following & followers)-done-set(queue)))
+    queue += (list((following ^ followers)-done-set(queue)))
     curse.execute('insert into gotcha values (?, ?, ?, ?)', (str(target), str(following), str(followers), str(tweets)))
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     conn.commit()
