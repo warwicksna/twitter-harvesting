@@ -107,7 +107,7 @@ def fetchTweets(url, args):
         except twitterError:
             print "Skipping protected user"
             break
-        tweets = tweets + data #nononononono
+        tweets = tweets + data
         page+=1
         args["page"]=str(page)
     return tweets
@@ -122,7 +122,7 @@ try:
     done = set(json.loads(curse.execute("select done from state").fetchone()[0]))
     queue = json.loads(curse.execute("select queue from state").fetchone()[0])
 except sqlite3.OperationalError:
-    curse.execute("create table gotcha (uid text, following text, followers text, tweets text)") #a smarter db design might help
+    curse.execute("create table gotcha (uid text, targetinfo text, following text, followers text, tweets text)") #a smarter db design might help
     curse.execute("create table state (done text, queue text)")
     curse.execute("insert into state values ('', '')")
     target = sys.argv[1]
@@ -135,11 +135,12 @@ while(True):
     done.add(target)
     followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
     following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
+    targetinfo = api("users/lookup.json",{"user_id":str(target)})
     tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
         queue += (list((following ^ followers)-done-set(queue)))
-    curse.execute('insert into gotcha values (?, ?, ?, ?)', (json.dumps(target), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
+    curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     conn.commit()
     print len(done)
