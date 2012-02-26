@@ -12,6 +12,7 @@ for user in base:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'))
             data = base64.b64encode(tweet["text"].encode('utf-8'))
             print "INSERT INTO `MessageProperties` VALUES("+str(tid)+", '"+data+"', '"+timestamp+"', 1, NULL);" #data MUST be escaped
-            print "INSERT INTO `MessageReceive` VALUES("+str(tid)+", "+str(tweet["in_reply_to_user_id"])+")";
+            print "INSERT INTO `MessageReceive` VALUES("+str(tid)+", "+str(tweet["in_reply_to_user_id"])+");"
             print "INSERT INTO `MessageSend` VALUES("+str(tid)+", "+str(uid)+");"
+            print
 
