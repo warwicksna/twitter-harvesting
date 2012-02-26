@@ -108,7 +108,7 @@ def fetchTweets(url, args):
         except twitterError:
             print "Skipping protected user"
             break
-        tweets = tweets + data
+        tweets = tweets + data #nononononono
         page+=1
         args["page"]=str(page)
     return tweets
@@ -141,11 +141,10 @@ while(True):
     followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
     following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
     tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
-
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
         queue += (list((following ^ followers)-done-set(queue)))
-    curse.execute('insert into gotcha values (?, ?, ?, ?)', (str(target), str(following), str(followers), str(tweets)))
+    curse.execute('insert into gotcha values (?, ?, ?, ?)', (json.dumps(target), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     conn.commit()
     print len(done)
