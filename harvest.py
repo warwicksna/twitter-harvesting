@@ -72,7 +72,7 @@ oauth_version=\""+oauth_version+"\""
                 print "Bad gateway on attempt "+str(fails)+""
                 if(fails >= 5):
                     print 'Too many 50X errors, taking a nap'
-                    time.sleep(pow(2, (fail)))
+                    time.sleep(pow(2, (fails)))
                 continue
             elif(error.code == 400):
                 status = api("account/rate_limit_status.json", {})["reset_time_in_seconds"]-time.time()
@@ -130,7 +130,7 @@ except sqlite3.OperationalError:
     curse.execute("create table gotcha (uid text, following text, followers text, tweets text)") #a smarter db design might help
     curse.execute("create table state (done text, queue text)")
     curse.execute("insert into state values ('', '')")
-    target = "uaf"  #how appropriate 
+    target = "uaf"  #how appropriate
     target = api("users/lookup.json",{"screen_name":target})[0]["id"]
     done = set([])
     queue = [target]
