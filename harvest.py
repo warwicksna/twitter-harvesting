@@ -1,5 +1,4 @@
-import os, base64, time, urllib, hashlib, hmac, urllib2, re, json, sqlite3
-# -*- coding: utf8 -*-
+import os, base64, time, urllib, hashlib, hmac, urllib2, re, json, sqlite3, sys
 
 class twitterError(Exception):
     def __init__(self, desc, code):
@@ -114,11 +113,7 @@ def fetchTweets(url, args):
     return tweets
         
         
-#TODO
-#deal with protected users
 
-#print api("account/verify_credentials.json", {})
-#print api("account/rate_limit_status.json", {})
 maxSize = 50000
 conn = sqlite3.connect('./rettiwt.db')
 curse = conn.cursor()
@@ -130,7 +125,7 @@ except sqlite3.OperationalError:
     curse.execute("create table gotcha (uid text, following text, followers text, tweets text)") #a smarter db design might help
     curse.execute("create table state (done text, queue text)")
     curse.execute("insert into state values ('', '')")
-    target = "uaf"  #how appropriate
+    target = sys.argv[1]
     target = api("users/lookup.json",{"screen_name":target})[0]["id"]
     done = set([])
     queue = [target]
