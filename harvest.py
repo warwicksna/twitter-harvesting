@@ -87,12 +87,8 @@ def fetchUsers(url, args):
     cursor = "-1"
     followers = []
     while(cursor != "0"):
-        try:
-            data = api(url, args)
-            followers = followers + data['ids']
-        except twitterError:
-            print "Skipping protected user"
-            break
+        data = api(url, args)
+        followers = followers + data['ids']
         cursor = data['next_cursor_str']
         args["cursor"] = cursor
     return followers
@@ -102,11 +98,7 @@ def fetchTweets(url, args):
     tweets = []
     data = ["z"]
     while(data != []):
-        try:
-            data = api(url, args)
-        except twitterError:
-            print "Skipping protected user"
-            break
+        data = api(url, args)
         tweets = tweets + data
         page+=1
         args["page"]=str(page)
@@ -133,9 +125,13 @@ except sqlite3.OperationalError:
 while(True):
     target = queue.pop(0)
     done.add(target)
-    followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
-    following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
-    targetinfo = api("users/lookup.json",{"user_id":str(target)})
+    try:
+        followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
+        following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
+        targetinfo = api("users/lookup.json",{"user_id":str(target)})
+    except twitterError:
+        print "Skipping protected user"
+        continue
     tweets = fetchTweets("statuses/user_timeline.json", {"count":"200","trim_user":"true", "user_id":str(target), "include_rts":"true"}) #randomly drops a few tweets
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
