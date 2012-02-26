@@ -38,5 +38,5 @@ for user in base:
                 nodes += "<node id=\""+str(fromid)+"\"/>\n"
                 dupnodes.add(str(fromid))
         
-graphml = "<graphml edgedefault=\"directed\">\n  <key id=\"name\" for=\"edge\" attr.name=\"name\" attr.type=\"string\"/> <graph>\n" + nodes + edges + "</graph>\n</graphml>";
+graphml = "<graphml edgedefault=\"directed\">\n  <key id=\"name\" for=\"edge\" attr.name=\"name\" attr.type=\"string\"/> <graph edgedefault=\"directed\">\n" + nodes + edges + "</graph>\n</graphml>";
 print graphml

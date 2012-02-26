@@ -30,5 +30,5 @@ for user in base:
             edges += "<edge  source=\""+str(fromid)+"\" target=\""+str(uid)+"\"/>\n" #id=\"e"+edgeID+"\"
             dupedges.add(edgeID)
         
-graphml = "<graphml edgedefault=\"directed\">\n  <key id=\"name\" for=\"edge\" attr.name=\"name\" attr.type=\"string\"/> <graph>\n" + nodes + edges + "</graph>\n</graphml>";
+graphml = "<graphml edgedefault=\"directed\">\n  <key id=\"name\" for=\"edge\" attr.name=\"name\" attr.type=\"string\"/> <graph edgedefault=\"directed\">\n" + nodes + edges + "</graph>\n</graphml>";
 print graphml
