@@ -7,7 +7,7 @@ tid = 0;
 for user in base:
     uid = json.loads(user[0])
     for tweet in json.loads(user[1]):
-        if(["in_reply_to_user_id"]):
+        if(tweet["in_reply_to_user_id"]):
             tid+=1
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'))
             data = base64.b64encode(tweet["text"].encode('utf-8'))
