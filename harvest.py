@@ -126,9 +126,9 @@ while(True):
     target = queue.pop(0)
     done.add(target)
     try:
+        targetinfo = api("users/lookup.json",{"user_id":str(target)})
         followers = set(fetchUsers("followers/ids.json", {"user_id":str(target)})) #gets all followers
         following = set(fetchUsers("friends/ids.json", {"user_id":str(target)})) #gets all following
-        targetinfo = api("users/lookup.json",{"user_id":str(target)})
     except twitterError:
         print "Skipping protected user"
         continue
