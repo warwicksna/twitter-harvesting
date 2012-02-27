@@ -87,7 +87,10 @@ def fetchUsers(url, args):
     cursor = "-1"
     followers = []
     while(cursor != "0"):
-        data = api(url, args)
+        try:
+            data = api(url, args)
+        except twitterError:
+            break
         followers = followers + data['ids']
         cursor = data['next_cursor_str']
         args["cursor"] = cursor
@@ -98,7 +101,10 @@ def fetchTweets(url, args):
     tweets = []
     data = ["z"]
     while(data != []):
-        data = api(url, args)
+        try:
+            data = api(url, args)
+        except twitterError:
+            break
         tweets = tweets + data
         page+=1
         args["page"]=str(page)
