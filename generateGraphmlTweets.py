@@ -2,7 +2,7 @@ import sqlite3, json
 
 conn = sqlite3.connect("./rettiwt.db")
 curse = conn.cursor()
-base = curse.execute("select uid, following, followers, targetinfo from gotcha limit 1000")
+base = curse.execute("select uid, following, followers, targetinfo from gotcha limit 300")
 dupedges = set([])
 dupnodes = set([])
 nodes = ""
@@ -40,7 +40,7 @@ for user in base:
         else:
             toid = tweet["in_reply_to_user_id"]
         if(toid):
-            if(toid not in json.loads(user[2]) and toid not in json.loads(user[3]) and str(toid) in dupnodes and str(fromid) in dupnodes): #assumes direction is irrelevant; (check user[2] only otherwise)
+            if(toid not in json.loads(user[2]) and toid not in json.loads(user[3]) and str(toid) in dupnodes and str(uid) in dupnodes): #assumes direction is irrelevant; (check user[2] only otherwise)
                 print "<edge source=\""+str(uid)+"\" target=\""+str(toid)+"\"/>"
 
 print "</graph>\n</graphml>";
