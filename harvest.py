@@ -129,6 +129,7 @@ except sqlite3.OperationalError:
     queue = [target]
 
 while(True):
+    fails = 0
     target = queue.pop(0)
     done.add(target)
     try:
@@ -144,7 +145,14 @@ while(True):
         queue += (list((following ^ followers)-done-set(queue)))
     curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
-    conn.commit()
+    try:
+        conn.commit()
+    except OperationalError:
+        fails+=1
+        if(fails >= 15):
+            exit
+        print 'Database write error, taking a nap'
+        time.sleep(pow(2, (fails)))
     print len(done)
 
 
