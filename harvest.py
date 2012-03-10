@@ -143,9 +143,9 @@ while(True):
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
         queue += (list((following ^ followers)-done-set(queue)))
-    curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
-    curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     try:
+        curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
+        curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
         conn.commit()
     except sqlite3.OperationalError:
         fails+=1
