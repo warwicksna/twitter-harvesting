@@ -147,7 +147,7 @@ while(True):
     curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
     try:
         conn.commit()
-    except OperationalError:
+    except sqlite3.OperationalError:
         fails+=1
         if(fails >= 15):
             exit
