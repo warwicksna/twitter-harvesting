@@ -143,16 +143,16 @@ while(True):
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
         queue += (list((following ^ followers)-done-set(queue)))
-    try:
-        curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
-        curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
-        conn.commit()
-    except sqlite3.OperationalError:
-        fails+=1
-        if(fails >= 15):
-            exit
-        print 'Database write error, taking a nap'
-        time.sleep(pow(2, (fails)))
+    while (fails < 15):
+        try:
+            curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
+            curse.execute('update state set done=?, queue=?', (json.dumps(list(done)), json.dumps(queue)))
+            conn.commit()
+            break
+        except sqlite3.OperationalError:
+            fails+=1
+            print 'Database write error #'+str(fails)+', taking a nap'
+            time.sleep(pow(2, (fails)))
     print len(done)
 
 
