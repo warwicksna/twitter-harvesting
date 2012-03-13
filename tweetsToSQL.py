@@ -6,10 +6,10 @@ base = curse.execute("select uid, tweets, followers, following from gotcha")
 tid = 0;
 for user in base:
     uid = json.loads(user[0])
+    followers = json.loads(user[2])
+    following = json.loads(user[3])
+    
     for tweet in json.loads(user[1]):
-        followers = json.loads(user[2])
-        following = json.loads(user[3])
-        
         if("retweeted_status" in tweet):
             toid = tweet["retweeted_status"]["user"]["id"]
         else:
