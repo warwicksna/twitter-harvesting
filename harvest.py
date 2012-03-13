@@ -113,7 +113,7 @@ def fetchTweets(url, args):
         
 
 maxSize = 50000
-conn = sqlite3.connect('./rettiwt.db')
+conn = sqlite3.connect('./rettiwt2.db')
 curse = conn.cursor()
 try:
     print curse.execute("select done from state").fetchone()[0]
