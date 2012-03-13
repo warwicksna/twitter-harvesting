@@ -151,7 +151,7 @@ while(True):
             break
         except sqlite3.OperationalError:
             fails+=1
-            if(fails > 5):
+            if(fails > 13):
                 tweets = ""
                 print "Dumping tweets"
             else:
