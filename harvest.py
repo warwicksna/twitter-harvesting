@@ -152,6 +152,7 @@ while(True):
         except sqlite3.OperationalError:
             fails+=1
             print 'Database write error #'+str(fails)+', taking a nap'
+            print json.dumps(target) + "\n\n" + json.dumps(targetinfo) + "\n\n" + json.dumps(list(following))
             time.sleep(pow(2, (fails)))
     print len(done)
 
