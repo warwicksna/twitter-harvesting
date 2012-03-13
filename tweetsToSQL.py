@@ -7,6 +7,8 @@ tid = 0;
 for user in base:
     uid = json.loads(user[0])
     for tweet in json.loads(user[1]):
+        followers = json.loads(user[2])
+        following = json.loads(user[3])
         
         if("retweeted_status" in tweet):
             toid = tweet["retweeted_status"]["user"]["id"]
@@ -15,8 +17,8 @@ for user in base:
             
         if(toid):
             tid+=1
-            if(toid not in json.loads(user[2]) and toid not in json.loads(user[3])): #assumes direction is irrelevant; (check user[2] only otherwise)
-                print "INSER INTO `Connected` VALUES("+str(tid)+", "+str(toid)+", 1, 0);"
+            if(toid not in followers and toid not in following): #assumes direction is irrelevant; (check user[2] only otherwise)
+                print "INSERT INTO `Connected` VALUES("+str(tid)+", "+str(toid)+", 1, 0);"
             
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'))
             data = base64.b64encode(tweet["text"].encode('utf-8'))
