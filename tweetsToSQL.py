@@ -2,7 +2,7 @@ import sqlite3, json, time, base64
 
 conn = sqlite3.connect("./rettiwt.db")
 curse = conn.cursor()
-base = curse.execute("select uid, tweets, followers, following from gotcha")
+base = curse.execute("select uid, tweets, followers, following from gotcha limit 100")
 tid = 0;
 for user in base:
     uid = json.loads(user[0])
@@ -23,8 +23,7 @@ for user in base:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'))
             data = base64.b64encode(tweet["text"].encode('utf-8'))
             print "INSERT INTO `MessageProperties` VALUES("+str(tid)+", '"+data+"', '"+timestamp+"', 1, NULL);" #data MUST be escaped
-            print "INSERT INTO `MessageReceive` VALUES("+str(tid)+", "+str(toid)+");"
-            print "INSERT INTO `MessageSend` VALUES("+str(tid)+", "+str(uid)+");"
+            print "INSERT INTO `MessageReceive` SELECT "+str(tid)+", EntityID FROM entity WHERE EntityName = '"+str(toid)+"';"
+            print "INSERT INTO `MessageSend` SELECT "+str(tid)+", EntityID FROM entity WHERE EntityName = '"+str(uid)+"';"
             print
                 
-
