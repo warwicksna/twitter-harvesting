@@ -31,16 +31,4 @@ for user in base:
             print "<edge  source=\""+str(fromid)+"\" target=\""+str(uid)+"\"/>" #id=\"e"+edgeID+"\"
             dupedges.add(edgeID)
         
-#base = curse.execute("select uid, tweets, followers, following from gotcha")
-#for user in base:
-#    uid = json.loads(user[0])
-#    for tweet in json.loads(user[1]):
-#        if("retweeted_status" in tweet):
-#            toid = tweet["retweeted_status"]["user"]["id"]
-#        else:
-#            toid = tweet["in_reply_to_user_id"]
-#        if(toid):
-#            if(toid not in json.loads(user[2]) and toid not in json.loads(user[3]) and str(toid) in dupnodes and str(fromid) in dupnodes): #assumes direction is irrelevant; (check user[2] only otherwise)
-#                print "<edge source=\""+str(uid)+"\" target=\""+str(toid)+"\"/>"
-
 print "</graph>\n</graphml>";
