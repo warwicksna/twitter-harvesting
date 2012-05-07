@@ -143,6 +143,7 @@ while(True):
     if(len(queue) < maxSize):
         queue += (list((following & followers)-done-set(queue)))
         queue += (list((following ^ followers)-done-set(queue)))
+        print "Userid: "+target+" Following " + targetinfo["followers_count"] + " Followers " + targetinfo["friends_count"]
     while (fails < 15):
         try:
             curse.execute('insert into gotcha values (?, ?, ?, ?, ?)', (json.dumps(target), json.dumps(targetinfo), json.dumps(list(following)), json.dumps(list(followers)), json.dumps(tweets)))
