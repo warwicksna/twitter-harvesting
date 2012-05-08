@@ -63,24 +63,21 @@ oauth_version=\""+oauth_version+"\""
             response = urllib2.urlopen(req)
             the_page = response.read()
             break
-        except urllib2.HTTPError as error:
+        except (urllib2.HTTPError, httplib.BadStatusLine) as error:
             if(error.code == 401 or error.code == 404):
                 raise twitterError('Protected/deleted user', 1)
-            elif(error.code == 502 or error.code == 503 or error.code == 500):
-                fails +=1
-                print "Bad gateway on attempt "+str(fails)+""
-                if(fails >= 5):
-                    print 'Too many 50X errors, taking a nap'
-                    time.sleep(pow(2, (fails)))
-                continue
             elif(error.code == 400):
                 status = api("account/rate_limit_status.json", {})["reset_time_in_seconds"]-time.time()
                 print "Rate limit hit. Sleeping for "+str(status)+" seconds"
                 time.sleep(status)
                 continue
             else:
-                print url
-                raise
+                fails +=1
+                print "Bad gateway on attempt "+str(fails)+""
+                if(fails >= 5):
+                    print 'Too many 50X errors, taking a nap'
+                    time.sleep(pow(2, (fails)))
+                continue
     return json.loads(the_page)
 
 def fetchUsers(url, args):
