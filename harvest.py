@@ -63,7 +63,8 @@ oauth_version=\""+oauth_version+"\""
             response = urllib2.urlopen(req)
             the_page = response.read()
             break
-        except Exception as error:
+        
+        except urllib2.HTTPError as error:
             if(error.code and (error.code == 401 or error.code == 404)):
                 raise twitterError('Protected/deleted user', 1)
             elif(error.code and error.code == 400):
@@ -74,6 +75,13 @@ oauth_version=\""+oauth_version+"\""
             else:
                 fails +=1
                 print "Bad gateway on attempt "+str(fails)+""
+                if(fails >= 5):
+                    print 'Too many 50X errors, taking a nap'
+                    time.sleep(pow(2, (fails)))
+                continue
+        except Exception as error:
+                fails +=1
+                print "Unknown error on attempt "+str(fails)+""
                 if(fails >= 5):
                     print 'Too many 50X errors, taking a nap'
                     time.sleep(pow(2, (fails)))
