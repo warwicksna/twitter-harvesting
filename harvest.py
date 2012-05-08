@@ -64,9 +64,9 @@ oauth_version=\""+oauth_version+"\""
             the_page = response.read()
             break
         except Exception as error:
-            if(error.code == 401 or error.code == 404):
+            if(error.code and error.code == 401 or error.code == 404):
                 raise twitterError('Protected/deleted user', 1)
-            elif(error.code == 400):
+            elif(error.code and error.code == 400):
                 status = api("account/rate_limit_status.json", {})["reset_time_in_seconds"]-time.time()
                 print "Rate limit hit. Sleeping for "+str(status)+" seconds"
                 time.sleep(status)
