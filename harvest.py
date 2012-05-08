@@ -63,7 +63,7 @@ oauth_version=\""+oauth_version+"\""
             response = urllib2.urlopen(req)
             the_page = response.read()
             break
-        except (urllib2.HTTPError, httplib.BadStatusLine) as error:
+        except Exception as error:
             if(error.code == 401 or error.code == 404):
                 raise twitterError('Protected/deleted user', 1)
             elif(error.code == 400):
